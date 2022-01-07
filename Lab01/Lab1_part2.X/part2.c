@@ -17,15 +17,16 @@ int main(void) {
      **************************************************************************************************/
 
     // Declare Variables
-    float fahr, celsius;
+    float fahr, celsius, kelv;
     int lower, upper, step;
-    char F, C;
+    char F, C, K;
 
     // Initializing Variables 
     lower = 0; // lower limit of temperature
     upper = 300; // upper limit ""
     step = 20; // step size
     fahr = lower;
+    kelv = lower;
 
     // Print out table
     printf("%5c %5c\n", 'F', 'C');
@@ -33,6 +34,15 @@ int main(void) {
         celsius = (5.0 / 9.0)*(fahr - 32.0);
         printf("%7.1f %04.0f\n", (double) fahr, (double) celsius);
         fahr = fahr + step;
+    }
+    
+    // Print out table for Kelvin to Fahrenheit
+    printf("\n");
+    printf("%4c %7c\n", 'K', 'F');
+     while (kelv <= upper) {
+        fahr = (kelv-273.15)*(9.0/5.0)+32.0;
+        printf("%03.3f %5f\n", (double) kelv, (double) fahr);
+        kelv = kelv + step;
     }
 
     /***************************************************************************************************
