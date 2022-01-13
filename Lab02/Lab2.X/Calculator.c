@@ -21,7 +21,7 @@ double Average(double operand1, double operand2);
 double AbsoluteValue(double operand);
 double FahrenheitToCelsius(double operand);
 double CelsiusToFahrenheit(double operand1);
-double Round(double operand1);
+int Round(double operand1);
 double Tangent(double operand);
 //add more prototypes here
 
@@ -33,7 +33,7 @@ void CalculatorRun(void) {
     while (1) {
         // Initializing the operator as a char
         char op = 'a';
-        printf("Enter a mathematical operation to perform (*,/,+,-,v,a,c,f,t,r): ");
+        printf("Enter a mathematical operation to perform (*,/,+,-,m,a,c,f,t,r): ");
 //        scanf("%c", &op);
         if (op == '*') {
             double operator1, operator2;
@@ -124,7 +124,7 @@ void CalculatorRun(void) {
             double answer = Average(operator1, operator2);
 
             //print result
-            printf("Result of Averaging(%f): %lf\n",operator1, answer);
+            printf("Result of Averaging (%lf & %lf): %lf\n",operator1, operator2, answer);
 
         } else if (op == 'a') {
             double operator1;
@@ -150,7 +150,7 @@ void CalculatorRun(void) {
             double answer = FahrenheitToCelsius(operator1);
 
             //print result
-            printf("Result of Fahrenheit %f to Celsius %lf\n",operator1, answer);
+            printf("Result of Fahrenheit %lf to Celsius %lf\n",operator1, answer);
 
         } else if (op == 'f') {
             double operator1;
@@ -242,7 +242,12 @@ double Divide(double operand1, double operand2) {
  * Define the Absolute Value function here.
  ********************************************************************************/
 double AbsoluteValue(double operand1) {
-    double result = abs(operand1);
+    double result = 0;
+    if(operand1 < 0) {
+        result = -operand1;
+    } else {
+        result = operand1;
+    }
     return result;
 }
 
@@ -250,7 +255,7 @@ double AbsoluteValue(double operand1) {
  * Define the Fahrenheit to Celsius function here.
  ********************************************************************************/
 double FahrenheitToCelsius(double operand1) {
-    double result = ((operand1 - 32) * (5 / 9));
+    double result = ((operand1 - 32) * 0.55555555555);
     return result;
 }
 
@@ -258,7 +263,7 @@ double FahrenheitToCelsius(double operand1) {
  * Define the Celsius to Fahrenheit function here.
  ********************************************************************************/
 double CelsiusToFahrenheit(double operand1) {
-    double result = ((operand1 + (9 / 5)) + 32);
+    double result = ((operand1 + (1.8)) + 32);
     return result;
 }
 
@@ -283,9 +288,8 @@ double Tangent(double operand1) {
  * In order to receive the extra credit your calculator MUST ALSO CORRECTLY utilize
  * this function.
  ********************************************************************************/
-double Round(double operand) {
-    double result = floor(operand);
-    return result;
+int Round(double operand) {
+    return operand < 0 ? operand - 0.5 : operand + 0.5;
 }
 
 
