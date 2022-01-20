@@ -7,9 +7,6 @@
 //CMPE13 Support Library
 #include "BOARD.h"
 
-
-
-
 // User libraries:
 #include "MatrixMath.h"
 

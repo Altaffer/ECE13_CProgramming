@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <math.h>
 
-//CMPE13 Support Library
 #include "BOARD.h"
 
 // User libraries:
@@ -16,7 +16,7 @@ void MatrixPrint(float mat[3][3]) {
     for (row = 0; row < 3; row++) {
         for (columns = 0; columns < 3; columns++) {
             // printing the values in the matrix
-            printf("%d     ", mat[row][columns]);
+            printf("%fl     ", mat[row][columns]);
         }
         printf("\n");
     }
@@ -24,75 +24,92 @@ void MatrixPrint(float mat[3][3]) {
 
 int MatrixEquals(float mat1[3][3], float mat2[3][3]) {
     // initializing the rows, columns, and truth detector
-    int row, column, result;
-    result = 1;
-    for (row = 0; row < 3; row++) {
-        for (column = 0; column < 3; column++) {
-            if (mat1[row][column] != mat2[row][column]) {
-                result = 0;
-                break;
+    for (int row = 0; row < 3; row++) {
+        for (int column = 0; column < 3; column++) {
+            if ((mat1[row][column] + FP_DELTA) != (mat2[row][column] + FP_DELTA)) {
+                return FALSE;
             }
         }
     }
-    return result;
+    return TRUE;
 }
 
 void MatrixAdd(float mat1[3][3], float mat2[3][3], float result[3][3]) {
-    for (int a = 0; a < 3; a++) {
-        for (int b = 0; b < 3; b++) {
-            result[a][b] = mat1[a][b] + mat2[a][b];
+    for (int row = 0; row < 3; row++) {
+        for (int column = 0; column < 3; column++) {
+            result[row][column] = mat1[row][column] + mat2[row][column];
         }
     }
-    return result;
 }
 
 void MatrixMultiply(float mat1[3][3], float mat2[3][3], float result[3][3]) {
-    for (int a = 0; a < 3; a++) {
-        for (int b = 0; b < 3; b++) {
+    for (int row = 0; row < 3; row++) {
+        for (int column = 0; column < 3; column++) {
             // initialize the result
-            result[a][b] = 0;
+            result[row][column] = 0;
             for (int c = 0; c < 3; c++)
-                result[a][b] += mat1[a][c] * mat2[c][b];
+                result[row][column] = mat1[row][c] * mat2[c][column];
         }
     }
-    return result;
 }
 
-void MatrixScalarAdd(float x, float mat[3][3], float result[3][3]){
-    for (int a = 0; a < 3; a++) {
-        for (int b = 0; b < 3; b++) {
-            result[a][b] = mat[a][b] + x;
+void MatrixScalarAdd(float x, float mat[3][3], float result[3][3]) {
+    for (int row = 0; row < 3; row++) {
+        for (int column = 0; column < 3; column++) {
+            result[row][column] = mat[row][column] + x;
         }
     }
-    return result;
 }
 
-void MatrixScalarMultiply(float x, float mat[3][3], float result[3][3]){
-    for (int a = 0; a < 3; a++) {
-        for (int b = 0; b < 3; b++) {
-            // initialize the result
-            result[a][b] = 0;
-            for (int c = 0; c < 3; c++)
-                result[a][b] += mat[a][c] * x;
+void MatrixScalarMultiply(float x, float mat[3][3], float result[3][3]) {
+    for (int row = 0; row < 3; row++) {
+        for (int column = 0; column < 3; column++) {
+            result[row][column] = mat[row][column] * x;
         }
     }
-    return result;
 }
 
-float MatrixTrace(float mat[3][3]);
+float MatrixTrace(float mat[3][3]) {
+    int sum;
+    for (int row = 0; row < 3; ++row) {
+        sum = sum + mat[row][row];
+    }
+    return sum;
+}
 
 void MatrixTranspose(float mat[3][3], float result[3][3]) {
     // switches the order of the values in the matrix
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
-            result[i][j] = mat[j][i];
+    for (int row = 0; row < 3; row++) {
+        for (int column = 0; column < 3; column++) {
+            result[row][column] = mat[column][row];
         }
     }
 }
 
-void MatrixSubmatrix(int i, int j, float mat[3][3], float result[2][2]);
+void MatrixSubmatrix(int i, int j, float mat[3][3], float result[2][2]) {
+    for (i = 0; i < 2; i++) {
+        for (j = 0; j < 2; j++) {
+            for (int row = 0; row < 2; row++) {
+                for (int column = 0; column < 2; column++) {
+                    result[row][column] = mat[row + i][column + j];
+                }
+            }
+        }
+    }
+}
 
-float MatrixDeterminant(float mat[3][3]);
+float MatrixDeterminant(float mat[3][3]) {
+    float deter = mat[0][0] * ((mat[1][1] * mat[2][2]) - (mat[2][1] * mat[1][2])) - mat[0][1] * (mat[1][0]
+            * mat[2][2] - mat[2][0] * mat[1][2]) + mat[0][2] * (mat[1][0] * mat[2][1] - mat[2][0] * mat[1][1]);
+    return deter;
+}
 
-void MatrixInverse(float mat[3][3], float result[3][3]);
-
+void MatrixInverse(float mat[3][3], float result[3][3]) {
+    float deter = mat[0][0] * ((mat[1][1] * mat[2][2]) - (mat[2][1] * mat[1][2])) - mat[0][1] * (mat[1][0]
+            * mat[2][2] - mat[2][0] * mat[1][2]) + mat[0][2] * (mat[1][0] * mat[2][1] - mat[2][0] * mat[1][1]);
+    for (int row = 0; row < 3; row++) {
+        for (int column = 0; column < 3; column++) {
+            result[row][column] = ((mat[(column + 1)][(row + 1)] * mat[(column + 2)][(row + 2)]) - (mat[(column + 1)][(row + 2)] * mat[(column + 2) % 3][(row + 1) % 3])) / deter;
+        }
+    }
+}
