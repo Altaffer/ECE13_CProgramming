@@ -1,0 +1,7 @@
+Programmer: Luca Altaffer taltaffe@ucsc.edu
+
+1. In this lab we made our own library for matrix opperations and tested their correctness. This lab was important because it taught us to use nested for loops, create functions in a separate file, and most importantly create a creative test harness. 
+
+2. Before starting this lab I spent a lot of time designing pseudocode. Because of this, creating the functions and test harness came really quickly as I knew what I was gonna do and how to do it before I even touched the computer. This worked very well and made debugging easier. I sometimes got errors in teh inverse function when using the submatrix function because the size of matrix it returned was smaller than a 3x3. I worked by myself and I don't think I would approach it differently. If anything, I would have started earlier. 
+
+3. I think I spent around 4 hours on pseudocode and another 4-5 hours writing the code itself. There wasn't anything particularly that I enjoyed about it, I in fact found it very tedious, but for an introductory programming class I can see why it would have value. I think the hardest part was debugging the submatrix function as I had an issue there that took me an hour or 2 to find. I didn't look at the grading distribution. I think the lab manual had a lot of information and was helpful. 
