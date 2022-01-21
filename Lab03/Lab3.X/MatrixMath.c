@@ -26,7 +26,8 @@ int MatrixEquals(float mat1[3][3], float mat2[3][3]) {
     // initializing the rows, columns, and truth detector
     for (int row = 0; row < 3; row++) {
         for (int column = 0; column < 3; column++) {
-            if ((mat1[row][column] + FP_DELTA) != (mat2[row][column] + FP_DELTA)) {
+            if (mat1[row][column]>(mat2[row][column] + FP_DELTA) ||
+                    mat1[row][column]<(mat2[row][column] - FP_DELTA)) {
                 return FALSE;
             }
         }
@@ -48,7 +49,7 @@ void MatrixMultiply(float mat1[3][3], float mat2[3][3], float result[3][3]) {
             // initialize the result
             result[row][column] = 0;
             for (int c = 0; c < 3; c++)
-                result[row][column] = mat1[row][c] * mat2[c][column];
+                result[row][column] += mat1[row][c] * mat2[c][column];
         }
     }
 }
@@ -70,11 +71,13 @@ void MatrixScalarMultiply(float x, float mat[3][3], float result[3][3]) {
 }
 
 float MatrixTrace(float mat[3][3]) {
-    int sum;
+    float trace;
     for (int row = 0; row < 3; ++row) {
-        sum = sum + mat[row][row];
+        for (int column = 0; column < 3; column++) {
+            trace = trace + mat[row][column] - FP_DELTA;
+        }
     }
-    return sum;
+    return trace;
 }
 
 void MatrixTranspose(float mat[3][3], float result[3][3]) {
@@ -109,7 +112,7 @@ void MatrixInverse(float mat[3][3], float result[3][3]) {
             * mat[2][2] - mat[2][0] * mat[1][2]) + mat[0][2] * (mat[1][0] * mat[2][1] - mat[2][0] * mat[1][1]);
     for (int row = 0; row < 3; row++) {
         for (int column = 0; column < 3; column++) {
-            result[row][column] = ((mat[(column + 1)][(row + 1)] * mat[(column + 2)][(row + 2)]) - (mat[(column + 1)][(row + 2)] * mat[(column + 2) % 3][(row + 1) % 3])) / deter;
+            result[row][column] = ((mat[(column + 1)][(row + 1)] * mat[(column + 2)][(row + 2)]) - (mat[(column + 1)][(row + 2)] * mat[(column + 2)][(row + 1)])) / deter;
         }
     }
 }
