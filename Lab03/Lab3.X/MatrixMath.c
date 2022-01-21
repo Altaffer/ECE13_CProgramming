@@ -92,19 +92,21 @@ void MatrixTranspose(float mat[3][3], float result[3][3]) {
 }
 
 void MatrixSubmatrix(int i, int j, float mat[3][3], float result[2][2]) {
-    int step1, step2;
-    for (int row = 0; row < 3; row++) {
-        if (row == i) {
+    int k, m, column;
+    int row = 0;
+    for (k = 0; k < DIM; k++) {
+        if (k == i) {
             continue;
         }
-        step1 += 1;
-        for (int column = 0; column < 3; column++) {
-            if (column == j) {
+        column = 0;
+        for (m = 0; m < DIM; m++) {
+            if (m == j) {
                 continue;
             }
-            step2 += 1;
-            result[step1][step2] = mat[row][column];
+            result[row][column] = mat[k][m];
+            column++;
         }
+        row++;
     }
 }
 
@@ -117,32 +119,32 @@ float MatrixDeterminant(float mat[3][3]) {
 }
 
 void MatrixInverse(float mat[3][3], float result[3][3]) {
-        float deter = MatrixDeterminant(mat);
-        float cofac[3][3] = {
+    float deter = MatrixDeterminant(mat);
+    float cofac[3][3] = {
         {},
         {},
         {}
-        };
-        for (int i = 0; i < 3; i++){
-            for (int j = 0; j < 3; j++){
-                float ressywessy[2][2] = {
-                {},
-                {}
-                };
-                MatrixSubmatrix(i,j,mat,ressywessy);
-                float deter2 = ressywessy[0][0]*ressywessy[1][1] - ressywessy[1][0]*ressywessy[0][1];
-                if((i+j)%2 == 0){
-                    cofac[i][j] = deter2;
-                } else {
-                    cofac[i][j] = -deter2;
-                }
+    };
+    float ressywessy[2][2] = {
+        {},
+        {}
+    };
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            MatrixSubmatrix(i, j, mat, ressywessy);
+            float deter2 = ressywessy[0][0] * ressywessy[1][1] - ressywessy[1][0] * ressywessy[0][1];
+            if ((i + j) % 2 == 0) {
+                cofac[i][j] = deter2;
+            } else {
+                cofac[i][j] = -deter2;
             }
         }
-        float trans[3][3] = {
+    }
+    float trans[3][3] = {
         {},
         {},
         {}
-        };
-        MatrixTranspose(cofac, trans);
-        MatrixScalarMultiply(1/deter, trans, result);
+    };
+    MatrixTranspose(cofac, trans);
+    MatrixScalarMultiply(1 / deter, trans, result);
 }

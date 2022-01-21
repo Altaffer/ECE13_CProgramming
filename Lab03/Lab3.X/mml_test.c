@@ -20,6 +20,18 @@ int FloatEquals(float x, float y) {
     }
     return TRUE;
 }
+int MatrixEquals2x2(float mat1[2][2], float mat2[2][2]) {
+    int i, j;
+    for (i = 0; i < 2; i++) {
+        for (j = 0; j < 2; j++) {
+            if (mat1[i][j]>(mat2[i][j] + FP_DELTA) ||
+                    mat1[i][j]<(mat2[i][j] - FP_DELTA)) {
+                return FALSE;
+            }
+        }
+    }
+    return TRUE;
+}
 
 int main()
 {
@@ -467,48 +479,19 @@ int main()
     PassedNumber = 0;
     // Test 1
     MatrixSubmatrix(i1, j1, matrixD, result2);
-    int row, column;
-    for (row = 0; row < 2; row++) {
-        for (column = 0; column < 2; column++) {
-            if (result2[row][column]>(matrix8[row][column] + FP_DELTA) ||
-                    result2[row][column]<(matrix8[row][column] - FP_DELTA)) {
-            }
-        }
-    }
-    PassedNumber += 1;
+    if (MatrixEquals2x2(result2, matrix8)) PassedNumber++;
 
     // Test 2
     MatrixSubmatrix(i2, j2, matrixL, result2);
-    for (row = 0; row < 2; row++) {
-        for (column = 0; column < 2; column++) {
-            if (result2[row][column]>(matrix18[row][column] + FP_DELTA) ||
-                    result2[row][column]<(matrix18[row][column] - FP_DELTA)) {
-            }
-        }
-    }
-    PassedNumber += 1;
+    if (MatrixEquals2x2(result2, matrix18)) PassedNumber++;
 
     // Test 3
     MatrixSubmatrix(i3, j3, matrixH, result2);
-    for (row = 0; row < 2; row++) {
-        for (column = 0; column < 2; column++) {
-            if (result2[row][column]>(matrix19[row][column] + FP_DELTA) ||
-                    result2[row][column]<(matrix19[row][column] - FP_DELTA)) {
-            }
-        }
-    }
-    PassedNumber += 1;
+    if (MatrixEquals2x2(result2, matrix19)) PassedNumber++;
     
     // Test 4
     MatrixSubmatrix(i2, j2, matrixQ, result2);
-for (row = 0; row < 2; row++) {
-        for (column = 0; column < 2; column++) {
-            if (result2[row][column]>(matrix23[row][column] + FP_DELTA) ||
-                    result2[row][column]<(matrix23[row][column] - FP_DELTA)) {
-            }
-        }
-    }
-    PassedNumber += 1;
+    if (MatrixEquals2x2(result2, matrix23)) PassedNumber++;
 
     if (PassedNumber >= 4) {
         printf("PASSED (%d/4) : MatrixSubmatrix\n", PassedNumber);
@@ -516,7 +499,6 @@ for (row = 0; row < 2; row++) {
     } else {
         printf("FAILED (%d/4) : MatrixSubmatrix\n", PassedNumber);
     }
-    
     
     // TESTING DETERMINANT
     PassedNumber = 0;
@@ -547,7 +529,6 @@ for (row = 0; row < 2; row++) {
     //Test 1
     MatrixInverse(matrixK, result3);
     if (MatrixEquals(result3, matrix9)) PassedNumber++;
-
     // Test 2
     MatrixInverse(matrixP, result3);
     if (MatrixEquals(result3, matrix14)) PassedNumber++;
