@@ -104,21 +104,45 @@ void MatrixSubmatrix(int i, int j, float mat[3][3], float result[2][2]) {
             }
             step2 += 1;
             result[step1][step2] = mat[row][column];
-            printf("%f\n", result[step1][step2]);
         }
     }
 }
 
 float MatrixDeterminant(float mat[3][3]) {
-    float deter = mat[0][0] * ((mat[1][1] * mat[2][2]) - (mat[2][1] * mat[1][2])) - mat[0][1] * (mat[1][0]
-            * mat[2][2] - mat[2][0] * mat[1][2]) + mat[0][2] * (mat[1][0] * mat[2][1] - mat[2][0] * mat[1][1]);
+    float deter = mat[0][0] * ((mat[1][1] * mat[2][2]) - (mat[2][1] * mat[1][2]))
+            - mat[0][1] * (mat[1][0]
+            * mat[2][2] - mat[2][0] * mat[1][2]) + mat[0][2] * (mat[1][0] *
+            mat[2][1] - mat[2][0] * mat[1][1]);
     return deter;
 }
 
 void MatrixInverse(float mat[3][3], float result[3][3]) {
-    for (int row = 0; row < 3; row++) {
-        for (int column = 0; column < 3; column++) {
-            result[row][column] = ((mat[(column + 1)][(row + 1)] * mat[(column + 2)][(row + 2)]) - (mat[(column + 1)][(row + 2)] * mat[(column + 2)][(row + 1)])) / MatrixDeterminant(mat);
+        float deter = MatrixDeterminant(mat);
+        float cofac[3][3] = {
+        {},
+        {},
+        {}
+        };
+        for (int i = 0; i < 3; i++){
+            for (int j = 0; j < 3; j++){
+                float ressywessy[2][2] = {
+                {},
+                {}
+                };
+                MatrixSubmatrix(i,j,mat,ressywessy);
+                float deter2 = ressywessy[0][0]*ressywessy[1][1] - ressywessy[1][0]*ressywessy[0][1];
+                if((i+j)%2 == 0){
+                    cofac[i][j] = deter2;
+                } else {
+                    cofac[i][j] = -deter2;
+                }
+            }
         }
-    }
+        float trans[3][3] = {
+        {},
+        {},
+        {}
+        };
+        MatrixTranspose(cofac, trans);
+        MatrixScalarMultiply(1/deter, trans, result);
 }
