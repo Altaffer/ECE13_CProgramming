@@ -94,12 +94,12 @@ void MatrixTranspose(float mat[3][3], float result[3][3]) {
 void MatrixSubmatrix(int i, int j, float mat[3][3], float result[2][2]) {
     int k, m, column;
     int row = 0;
-    for (k = 0; k < DIM; k++) {
+    for (k = 0; k < 3; k++) {
         if (k == i) {
             continue;
         }
         column = 0;
-        for (m = 0; m < DIM; m++) {
+        for (m = 0; m < 3; m++) {
             if (m == j) {
                 continue;
             }
