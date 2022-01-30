@@ -16,10 +16,10 @@ void StackInit(struct Stack *stack) {
 
 int StackPush(struct Stack *stack, double value) {
     if (stack->currentItemIndex == 19) {
-        printf("The stack is full");
+        printf("The stack is full\n");
         return STANDARD_ERROR;
     } else {
-        stack->currentItemIndex += 1;
+        stack->currentItemIndex++;
         stack->stackItems[stack->currentItemIndex] = value;
         return SUCCESS;
     }
@@ -29,11 +29,11 @@ int StackPush(struct Stack *stack, double value) {
 
 int StackPop(struct Stack *stack, double *value) {
     if (stack->currentItemIndex == -1) {
-        printf("The stack is empty");
+        printf("The stack is empty\n");
         return STANDARD_ERROR;
     } else {
-        value = &stack->stackItems[stack->currentItemIndex];
-        stack->stackItems[stack->currentItemIndex--];
+        *value = stack->stackItems[stack->currentItemIndex];
+        stack->currentItemIndex--;
         return SUCCESS;
     }
 }
@@ -42,9 +42,9 @@ int StackPop(struct Stack *stack, double *value) {
 
 int StackIsEmpty(const struct Stack *stack) {
     if (stack->currentItemIndex == -1) {
-        return SUCCESS;
+        return TRUE;
     } else {
-        return STANDARD_ERROR;
+        return FALSE;
     }
 }
 
@@ -52,9 +52,9 @@ int StackIsEmpty(const struct Stack *stack) {
 
 int StackIsFull(const struct Stack *stack) {
  if (stack->currentItemIndex == 19) {
-        return SUCCESS;
+        return TRUE;
     } else {
-        return STANDARD_ERROR;
+        return FALSE;
     }
 }
 

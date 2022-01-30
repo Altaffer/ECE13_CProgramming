@@ -17,7 +17,7 @@ int main()
     BOARD_Init();
     int error;
 
-    printf("\n###### Beginning CRUZID's rpn test harness: ####\n\n");
+    printf("\n###### Beginning taltaffe's rpn test harness: ####\n\n");
 
     //What follows is starter code.  You will need to modify it!
     
