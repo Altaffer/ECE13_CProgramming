@@ -18,7 +18,7 @@
       <itemPath>rpn.c</itemPath>
       <itemPath>stack.c</itemPath>
       <itemPath>BOARD.c</itemPath>
-      <itemPath>rpn_test.c</itemPath>
+      <itemPath>Lab04_main.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
