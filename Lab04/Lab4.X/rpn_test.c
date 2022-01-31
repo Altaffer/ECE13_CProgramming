@@ -28,13 +28,13 @@ void testRPN_Eval() {
     } else {
         printf("   Success!\n");
     }
-    
+
     char test1[] = "2 0 /";
     double result1;
     printf("Testing RPN_Evaluate1 with \"%s\"... \n ", test1);
     RPN_Evaluate(test1, &result1);
     printf("   Success!\n");
-    
+
     char test2[] = "1 4 + 6 4 - * 8 /";
     double result2;
     double expected2 = 1.25;
@@ -82,7 +82,7 @@ int main() {
 
     //What follows is starter code.  You will need to modify it!
     testRPN_Eval();
-    //    testProcessBack();
+    testProcessBack();
 
     BOARD_End();
     while (1);
