@@ -62,8 +62,8 @@ int main() {
     printf("\n###### Beginning taltaffe's rpn test harness: ####\n\n");
 
     //What follows is starter code.  You will need to modify it!
-        testRPN_Eval();
-    testProcessBack();
+    testRPN_Eval();
+//    testProcessBack();
 
     BOARD_End();
     while (1);

@@ -8,6 +8,7 @@
 
 int RPN_Evaluate(char * rpn_string, double * result) {
     int len = strlen(rpn_string);
+    printf("%i\n", len);
     char* token = strtok(rpn_string, " ");
     struct Stack stack = {};
     StackInit(&stack);
@@ -15,11 +16,6 @@ int RPN_Evaluate(char * rpn_string, double * result) {
         if ((token[0] == '+') || (token[0] == '-') || (token[0] == '*') ||
                 (token[0] == '/')) {
             printf("Error: Cannot start with an operator");
-            return STANDARD_ERROR;
-        }
-        if ((token[2] != '+') || (token[2] != '-') || (token[2] != '*') ||
-                (token[2] != '/')) {
-            printf("Error: operator was not stated properly");
             return STANDARD_ERROR;
         }
         if ((token[0] < 0x30) && (token[0] > 0x39)) {
@@ -32,6 +28,7 @@ int RPN_Evaluate(char * rpn_string, double * result) {
         }
         double counter = 1;
         double counter2 = 0;
+        double z = 0;
         for (int i = 0; i <= len; i++) {
             if ((token[i] >= 0x30) && (token[i] <= 0x39)) {
                 StackPush(&stack, token[i]);
@@ -39,46 +36,46 @@ int RPN_Evaluate(char * rpn_string, double * result) {
             if (token[i] == '+') {
                 double a = StackPop(&stack, &counter2);
                 double b = StackPop(&stack, &counter);
-                printf("a: %fl, b: %fl\n", a,b);
+                printf("a: %fl, b: %fl\n", a, b);
                 counter++;
                 counter2++;
-                *result = a + b;
-                StackPush(&stack, *result);
+                z = a + b;
+                StackPush(&stack, z);
             }
             if (token[i] == '-') {
                 double a = StackPop(&stack, (&counter2));
                 double b = StackPop(&stack, &counter);
-                printf("a: %fl, b:%fl\n", a,b);
+                printf("a: %fl, b:%fl\n", a, b);
                 counter++;
                 counter2++;
-                *result = a - b;
-                StackPush(&stack, *result);
+                z = a - b;
+                StackPush(&stack, z);
             }
             if (token[i] == '*') {
                 double a = StackPop(&stack, (&counter2));
                 double b = StackPop(&stack, &counter);
-                printf("a: %fl, b:%fl\n", a,b);
+                printf("a: %fl, b:%fl\n", a, b);
                 counter++;
                 counter2++;
-                *result = a * b;
-                StackPush(&stack, *result);
+                z = a * b;
+                StackPush(&stack, z);
             }
             if (token[i] == '/') {
                 double a = StackPop(&stack, (&counter2));
                 double b = StackPop(&stack, &counter);
-                printf("a: %fl, b:%fl\n", a,b);
+                printf("a: %fl, b:%fl\n", a, b);
                 counter++;
                 counter2++;
-                *result = a / b;
-                StackPush(&stack, *result);
+                z = a / b;
+                StackPush(&stack, z);
             }
         }
+        *result = z;
     }
-    return 0;
 }
 
 int ProcessBackspaces(char *rpn_sentence) {
-char *i, *j;
+    char *i, *j;
 
     for (i = j = rpn_sentence; *i != '\0'; i++) {
         if (*i == '\b') {
