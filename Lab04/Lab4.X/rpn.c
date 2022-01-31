@@ -8,12 +8,10 @@
 
 int RPN_Evaluate(char * rpn_string, double * result) {
     int len = strlen(rpn_string);
-    printf("%i\n", len);
     char* token = strtok(rpn_string, " ");
     struct Stack stack = {};
     StackInit(&stack);
-    while (token != NULL) {
-        if ((token[0] == '+') || (token[0] == '-') || (token[0] == '*') ||
+    if ((token[0] == '+') || (token[0] == '-') || (token[0] == '*') ||
                 (token[0] == '/')) {
             printf("Error: Cannot start with an operator");
             return STANDARD_ERROR;
@@ -26,14 +24,16 @@ int RPN_Evaluate(char * rpn_string, double * result) {
             printf("Error: Invalid character in second term");
             return STANDARD_ERROR;
         }
+    while (token != NULL) {
         double counter = 1;
         double counter2 = 0;
         double z = 0;
-        for (int i = 0; i <= len; i++) {
-            if ((token[i] >= 0x30) && (token[i] <= 0x39)) {
-                StackPush(&stack, token[i]);
+        printf("token %c\n", token);
+//        for (int i = 0; i <= len; i++) {
+            if ((token[0] >= 0x30) && (token[0] <= 0x39)) {
+                StackPush(&stack, token[0]);
             }
-            if (token[i] == '+') {
+            if (token[0] == '+') {
                 double a = StackPop(&stack, &counter2);
                 double b = StackPop(&stack, &counter);
                 printf("a: %fl, b: %fl\n", a, b);
@@ -42,7 +42,7 @@ int RPN_Evaluate(char * rpn_string, double * result) {
                 z = a + b;
                 StackPush(&stack, z);
             }
-            if (token[i] == '-') {
+            if (token[0] == '-') {
                 double a = StackPop(&stack, (&counter2));
                 double b = StackPop(&stack, &counter);
                 printf("a: %fl, b:%fl\n", a, b);
@@ -51,7 +51,7 @@ int RPN_Evaluate(char * rpn_string, double * result) {
                 z = a - b;
                 StackPush(&stack, z);
             }
-            if (token[i] == '*') {
+            if (token[0] == '*') {
                 double a = StackPop(&stack, (&counter2));
                 double b = StackPop(&stack, &counter);
                 printf("a: %fl, b:%fl\n", a, b);
@@ -60,7 +60,7 @@ int RPN_Evaluate(char * rpn_string, double * result) {
                 z = a * b;
                 StackPush(&stack, z);
             }
-            if (token[i] == '/') {
+            if (token[0] == '/') {
                 double a = StackPop(&stack, (&counter2));
                 double b = StackPop(&stack, &counter);
                 printf("a: %fl, b:%fl\n", a, b);
@@ -69,7 +69,8 @@ int RPN_Evaluate(char * rpn_string, double * result) {
                 z = a / b;
                 StackPush(&stack, z);
             }
-        }
+//        }
+        token = strtok(NULL, " ");
         *result = z;
     }
 }

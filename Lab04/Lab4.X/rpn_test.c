@@ -21,13 +21,14 @@ void testRPN_Eval() {
     printf("Testing RPN_Evaluate with \"%s\"... \n ", test0);
     int error;
     error = RPN_Evaluate(test0, &result0);
-    if (error == STANDARD_ERROR) {
+    if (error) {
         printf("   Failed, RPN_Evaluate produced an error\n");
     } else if (result0 != expected0) {
         printf("   Failed, expected = %f , result = %f\n", expected0, result0);
     } else {
         printf("   Success!\n");
     }
+    printf("%lf\n", result0);
 }
 
 void testProcessBack() {
