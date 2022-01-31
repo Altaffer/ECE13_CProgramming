@@ -30,6 +30,10 @@ int main() {
         printf("Enter floats and + - / * in RPN format:\n");
 
         fgets(rpn_sentence, sizeof (rpn_sentence), stdin);
+        
+        if (ProcessBackspaces(rpn_sentence) > MAX_INPUT_LENGTH){
+            printf("Error: Sentence is longer than input length");
+        }
 
         RPN_Evaluate(rpn_sentence, &result);
 

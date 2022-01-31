@@ -1,78 +1,88 @@
-#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <ctype.h>
 
 #include "BOARD.h"
-#include "rpn.h"
 #include "stack.h"
+#include "rpn.h"
 
 int RPN_Evaluate(char * rpn_string, double * result) {
-    int len = strlen(rpn_string);
-    char* token = strtok(rpn_string, " ");
-    struct Stack stack = {};
-    StackInit(&stack);
-    if ((token[0] == '+') || (token[0] == '-') || (token[0] == '*') ||
+        int len = strlen(rpn_string);
+        char* token = strtok(rpn_string, " ");
+        struct Stack stack = {};
+        StackInit(&stack);
+        if ((token[0] == '+') || (token[0] == '*') ||
                 (token[0] == '/')) {
             printf("Error: Cannot start with an operator");
-            return STANDARD_ERROR;
+            return RPN_ERROR_INVALID_TOKEN;
         }
         if ((token[0] < 0x30) && (token[0] > 0x39)) {
             printf("Error: Invalid character in first term");
-            return STANDARD_ERROR;
+            return RPN_ERROR_INVALID_TOKEN;
         }
-        if ((token[1] < 0x30) && (token[1] > 0x39)) {
+        if ((token[2] < 0x30) && (token[2] > 0x39)) {
             printf("Error: Invalid character in second term");
-            return STANDARD_ERROR;
+            return RPN_ERROR_INVALID_TOKEN;
         }
-    while (token != NULL) {
+        if (len > 40) {
+            printf("too many characters");
+            RPN_ERROR_STACK_OVERFLOW;
+        }
         double counter = 1;
         double counter2 = 0;
         double z = 0;
-        printf("token %c\n", token);
-//        for (int i = 0; i <= len; i++) {
-            if ((token[0] >= 0x30) && (token[0] <= 0x39)) {
-                StackPush(&stack, token[0]);
+        double a, b;
+//        int decCounter;
+        while (token != NULL) {
+//            decCounter = 0;
+//            for (int i =0; i < len; i++){
+//                 if (((token[0] == '-') && (len > 1)) || (isdigit(token[i])) || 
+//                         ((token[i] == '.') && (decCounter < 1))) {
+//                     if (token[i] == '.') {
+//                         decCounter++;
+//                     }
+//                     continue;
+//                 }
+//                 else{
+//                     return RPN_ERROR_INVALID_TOKEN;
+//                 }
+//            }
+            if (((token[0] >= 0x30) && (token[0] <= 0x39))) {
+                StackPush(&stack, atof(token));
             }
             if (token[0] == '+') {
-                double a = StackPop(&stack, &counter2);
-                double b = StackPop(&stack, &counter);
-                printf("a: %fl, b: %fl\n", a, b);
-                counter++;
-                counter2++;
-                z = a + b;
+                StackPop(&stack, &a);
+                StackPop(&stack, &b);
+                z = b + a;
                 StackPush(&stack, z);
             }
             if (token[0] == '-') {
-                double a = StackPop(&stack, (&counter2));
-                double b = StackPop(&stack, &counter);
-                printf("a: %fl, b:%fl\n", a, b);
-                counter++;
-                counter2++;
-                z = a - b;
+                StackPop(&stack, &a);
+                StackPop(&stack, &b);
+                z = b - a;
                 StackPush(&stack, z);
             }
             if (token[0] == '*') {
-                double a = StackPop(&stack, (&counter2));
-                double b = StackPop(&stack, &counter);
-                printf("a: %fl, b:%fl\n", a, b);
-                counter++;
-                counter2++;
-                z = a * b;
+                StackPop(&stack, &a);
+                StackPop(&stack, &b);
+                z = b * a;
                 StackPush(&stack, z);
             }
             if (token[0] == '/') {
-                double a = StackPop(&stack, (&counter2));
-                double b = StackPop(&stack, &counter);
-                printf("a: %fl, b:%fl\n", a, b);
-                counter++;
-                counter2++;
-                z = a / b;
+                StackPop(&stack, &a);
+                StackPop(&stack, &b);
+                if (a == 0) {
+                    printf("Cannot divide by 0\n");
+                    return RPN_ERROR_DIVIDE_BY_ZERO;
+                }
+                z = b / a;
                 StackPush(&stack, z);
             }
-//        }
-        token = strtok(NULL, " ");
-        *result = z;
-    }
+            
+            token = strtok(NULL, " ");
+            *result = z;
+        }
 }
 
 int ProcessBackspaces(char *rpn_sentence) {
