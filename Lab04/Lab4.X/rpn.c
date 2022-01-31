@@ -1,149 +1,94 @@
-/* ************************************************************************** */
-/** Descriptive File Name
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
-  @Company
-    Company Name
+#include "BOARD.h"
+#include "rpn.h"
+#include "stack.h"
 
-  @File Name
-    filename.c
-
-  @Summary
-    Brief description of the file.
-
-  @Description
-    Describe the purpose of this file.
- */
-/* ************************************************************************** */
-
-/* ************************************************************************** */
-/* ************************************************************************** */
-/* Section: Included Files                                                    */
-/* ************************************************************************** */
-/* ************************************************************************** */
-
-/* This section lists the other files that are included in this file.
- */
-
-/* TODO:  Include other files here if needed. */
-
-
-/* ************************************************************************** */
-/* ************************************************************************** */
-/* Section: File Scope or Global Data                                         */
-/* ************************************************************************** */
-/* ************************************************************************** */
-
-/*  A brief description of a section can be given directly below the section
-    banner.
- */
-
-/* ************************************************************************** */
-/** Descriptive Data Item Name
-
-  @Summary
-    Brief one-line summary of the data item.
-    
-  @Description
-    Full description, explaining the purpose and usage of data item.
-    <p>
-    Additional description in consecutive paragraphs separated by HTML 
-    paragraph breaks, as necessary.
-    <p>
-    Type "JavaDoc" in the "How Do I?" IDE toolbar for more information on tags.
-    
-  @Remarks
-    Any additional remarks
- */
-int global_data;
-
-
-/* ************************************************************************** */
-/* ************************************************************************** */
-// Section: Local Functions                                                   */
-/* ************************************************************************** */
-/* ************************************************************************** */
-
-/*  A brief description of a section can be given directly below the section
-    banner.
- */
-
-/* ************************************************************************** */
-
-/** 
-  @Function
-    int ExampleLocalFunctionName ( int param1, int param2 ) 
-
-  @Summary
-    Brief one-line description of the function.
-
-  @Description
-    Full description, explaining the purpose and usage of the function.
-    <p>
-    Additional description in consecutive paragraphs separated by HTML 
-    paragraph breaks, as necessary.
-    <p>
-    Type "JavaDoc" in the "How Do I?" IDE toolbar for more information on tags.
-
-  @Precondition
-    List and describe any required preconditions. If there are no preconditions,
-    enter "None."
-
-  @Parameters
-    @param param1 Describe the first parameter to the function.
-    
-    @param param2 Describe the second parameter to the function.
-
-  @Returns
-    List (if feasible) and describe the return values of the function.
-    <ul>
-      <li>1   Indicates an error occurred
-      <li>0   Indicates an error did not occur
-    </ul>
-
-  @Remarks
-    Describe any special behavior not described above.
-    <p>
-    Any additional remarks.
-
-  @Example
-    @code
-    if(ExampleFunctionName(1, 2) == 0)
-    {
-        return 3;
+int RPN_Evaluate(char * rpn_string, double * result) {
+    int len = strlen(rpn_string);
+    char* token = strtok(rpn_string, " ");
+    struct Stack stack = {};
+    StackInit(&stack);
+    while (token != NULL) {
+        if ((token[0] == '+') || (token[0] == '-') || (token[0] == '*') ||
+                (token[0] == '/')) {
+            printf("Error: Cannot start with an operator");
+            return STANDARD_ERROR;
+        }
+        if ((token[2] != '+') || (token[2] != '-') || (token[2] != '*') ||
+                (token[2] != '/')) {
+            printf("Error: operator was not stated properly");
+            return STANDARD_ERROR;
+        }
+        if ((token[0] < 0x30) && (token[0] > 0x39)) {
+            printf("Error: Invalid character in first term");
+            return STANDARD_ERROR;
+        }
+        if ((token[1] < 0x30) && (token[1] > 0x39)) {
+            printf("Error: Invalid character in second term");
+            return STANDARD_ERROR;
+        }
+        double counter = 1;
+        double counter2 = 0;
+        for (int i = 0; i <= len; i++) {
+            if ((token[i] >= 0x30) && (token[i] <= 0x39)) {
+                StackPush(&stack, token[i]);
+            }
+            if (token[i] == '+') {
+                double a = StackPop(&stack, &counter2);
+                double b = StackPop(&stack, &counter);
+                printf("a: %fl, b: %fl\n", a,b);
+                counter++;
+                counter2++;
+                *result = a + b;
+                StackPush(&stack, *result);
+            }
+            if (token[i] == '-') {
+                double a = StackPop(&stack, (&counter2));
+                double b = StackPop(&stack, &counter);
+                printf("a: %fl, b:%fl\n", a,b);
+                counter++;
+                counter2++;
+                *result = a - b;
+                StackPush(&stack, *result);
+            }
+            if (token[i] == '*') {
+                double a = StackPop(&stack, (&counter2));
+                double b = StackPop(&stack, &counter);
+                printf("a: %fl, b:%fl\n", a,b);
+                counter++;
+                counter2++;
+                *result = a * b;
+                StackPush(&stack, *result);
+            }
+            if (token[i] == '/') {
+                double a = StackPop(&stack, (&counter2));
+                double b = StackPop(&stack, &counter);
+                printf("a: %fl, b:%fl\n", a,b);
+                counter++;
+                counter2++;
+                *result = a / b;
+                StackPush(&stack, *result);
+            }
+        }
     }
- */
-static int ExampleLocalFunction(int param1, int param2) {
     return 0;
 }
 
+int ProcessBackspaces(char *rpn_sentence) {
+char *i, *j;
 
-/* ************************************************************************** */
-/* ************************************************************************** */
-// Section: Interface Functions                                               */
-/* ************************************************************************** */
-/* ************************************************************************** */
-
-/*  A brief description of a section can be given directly below the section
-    banner.
- */
-
-// *****************************************************************************
-
-/** 
-  @Function
-    int ExampleInterfaceFunctionName ( int param1, int param2 ) 
-
-  @Summary
-    Brief one-line description of the function.
-
-  @Remarks
-    Refer to the example_file.h interface header for function usage details.
- */
-int ExampleInterfaceFunction(int param1, int param2) {
-    return 0;
+    for (i = j = rpn_sentence; *i != '\0'; i++) {
+        if (*i == '\b') {
+            if (j != rpn_sentence) {
+                j--;
+            }
+            continue;
+        }
+        *j++ = *i;
+    }
+    *j = '\0';
+    return strlen(rpn_sentence);
 }
-
-
-/* *****************************************************************************
- End of File
- */
