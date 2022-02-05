@@ -57,12 +57,12 @@ char *LinkedListRemove(ListItem * item) {
 }
 
 int LinkedListSize(ListItem * list) {
-    if (list = NULL){
+    if (list = NULL) {
         return NULL;
     }
     struct ListItem *head = LinkedListGetFirst(list);
     int count = 0;
-    while (head != NULL){
+    while (head != NULL) {
         count++;
         head = head->nextItem;
     }
@@ -73,10 +73,10 @@ ListItem * LinkedListGetFirst(ListItem * list) {
     if (list == NULL) {
         return NULL;
     }
-    if (list->previousItem == NULL){
+    if (list->previousItem == NULL) {
         return list;
-    }else{
-        while(list->previousItem != NULL){
+    } else {
+        while (list->previousItem != NULL) {
             list = list->previousItem;
         }
     }
@@ -84,30 +84,50 @@ ListItem * LinkedListGetFirst(ListItem * list) {
 }
 
 ListItem * LinkedListGetLast(ListItem * list) {
-    if (list == NULL){
+    if (list == NULL) {
         return NULL;
     }
-    if (list->nextItem = NULL){
+    if (list->nextItem = NULL) {
         return list;
-    }else{
-        while(list->nextItem != NULL){
+    } else {
+        while (list->nextItem != NULL) {
             list = list->nextItem;
         }
     }
     return list;
-}   
+}
 
 int LinkedListSwapData(ListItem *firstItem, ListItem * secondItem) {
+    if ((firstItem == NULL) || (secondItem == NULL)) {
+        return STANDARD_ERROR;
+    }
+//    struct ListItem *firstHelper = firstItem->nextItem;
+//    struct ListItem *secondHelper = secondItem->nextItem;
+//    struct ListItem *firstHelper2 = firstItem->previousItem;
+//    struct ListItem *secondHelper2 = secondItem->previousItem;
+//    if(firstItem->previousItem == NULL){
+//        secondItem->nextItem = firstHelper;
+//        second
+//    }
+//    secondItem->nextItem = firstHelper;
+//    secondItem->previousItem = firstHelper2;
+//    firstItem->nextItem = secondHelper;
+//    firstItem->previous = secondHelper2;
+    struct ListItem *secondHelper = secondItem;
+    struct ListItem *firstHelper = firstItem;
+    firstItem = secondHelper;
+    secondItem = firstHelper;
 
+    return SUCCESS;
 }
 
 int LinkedListPrint(ListItem * list) {
-    if(list == NULL){
+    if (list == NULL) {
         return STANDARD_ERROR;
     }
     struct ListItem *head = LinkedListGetFirst(list);
     int count = 0;
-    while (head != NULL){
+    while (head != NULL) {
         count++;
         printf("%d, ", head);
         head = head->nextItem;
