@@ -20,9 +20,9 @@ ListItem *LinkedListNew(char *data) {
 }
 
 ListItem *LinkedListCreateAfter(ListItem *item, char *data) {
-    LinkedListNew(&data);
+    LinkedListNew(data);
 
-    struct ListItem *newItem = LinkedListNew(&data);
+    struct ListItem *newItem = LinkedListNew(data);
     if (newItem == NULL) {
         return NULL;
     }
@@ -58,7 +58,7 @@ char *LinkedListRemove(ListItem * item) {
 
 int LinkedListSize(ListItem * list) {
     if (list = NULL) {
-        return NULL;
+        return 0;
     }
     struct ListItem *head = LinkedListGetFirst(list);
     int count = 0;
