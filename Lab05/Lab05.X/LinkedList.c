@@ -1,3 +1,8 @@
+/* 
+ * File:   LinkedList.c
+ * Author: Luca Altaffer taltaffe@ucsc.edu
+ */
+
 #include <stdio.h>
 #include <string.h>
 
@@ -20,24 +25,22 @@ ListItem *LinkedListNew(char *data) {
 }
 
 ListItem *LinkedListCreateAfter(ListItem *item, char *data) {
-    LinkedListNew(data);
-
-    struct ListItem *newItem = LinkedListNew(data);
-    if (newItem == NULL) {
+  ListItem* node = LinkedListNew(data);
+    if (node) {
+        if (!item) {
+            return node;
+        } else {
+            node->nextItem = item->nextItem;
+            node->previousItem = item;
+            item->nextItem = node;
+            if (node->nextItem) {
+                node->nextItem->previousItem = node;
+            }
+            return node;
+        }
+    } else {
         return NULL;
     }
-    if (item == NULL) {
-        return newItem;
-    }
-    if (item->nextItem == NULL) {
-        item->nextItem = newItem;
-        newItem->previousItem = item;
-    } else {
-        item->nextItem->previousItem = newItem;
-        item->nextItem = newItem;
-        newItem->previousItem = item;
-    }
-    return newItem;
 }
 
 char *LinkedListRemove(ListItem * item) {
@@ -57,81 +60,79 @@ char *LinkedListRemove(ListItem * item) {
 }
 
 int LinkedListSize(ListItem * list) {
-    if (list = NULL) {
+    int length = 1;
+    if (!list) {
         return 0;
     }
-    struct ListItem *head = LinkedListGetFirst(list);
-    int count = 0;
-    while (head != NULL) {
-        count++;
-        head = head->nextItem;
+    ListItem* curr = malloc(sizeof (ListItem));
+    if (curr) {
+        curr = LinkedListGetFirst(list);
+        while (curr->nextItem) {
+            length++;
+            curr = curr->nextItem;
+        }
     }
-    return count;
+    return length;
 }
 
 ListItem * LinkedListGetFirst(ListItem * list) {
-    if (list == NULL) {
+    if (!list) {
         return NULL;
     }
-    if (list->previousItem == NULL) {
-        return list;
-    } else {
-        while (list->previousItem != NULL) {
-            list = list->previousItem;
+    ListItem* curr = malloc(sizeof (ListItem));
+    if (curr) {
+        curr = list;
+        while (curr->previousItem) {
+            curr = curr->previousItem;
         }
+        return curr;
+    } else {
+        return NULL;
     }
-    return list;
 }
 
 ListItem * LinkedListGetLast(ListItem * list) {
-    if (list == NULL) {
+    if (!list) {
         return NULL;
     }
-    if (list->nextItem = NULL) {
-        return list;
-    } else {
-        while (list->nextItem != NULL) {
-            list = list->nextItem;
+    ListItem* curr = malloc(sizeof (ListItem));
+    if (curr) {
+        curr = list;
+        while (curr->nextItem) {
+            curr = curr->nextItem;
         }
+        return curr;
+    } else {
+        return NULL;
     }
-    return list;
 }
 
 int LinkedListSwapData(ListItem *firstItem, ListItem * secondItem) {
-    if ((firstItem == NULL) || (secondItem == NULL)) {
+    if (!firstItem || !secondItem) {
         return STANDARD_ERROR;
+    } else {
+        char * temp = firstItem->data;
+        firstItem->data = secondItem->data;
+        secondItem->data = temp;
+        return SUCCESS;
     }
-//    struct ListItem *firstHelper = firstItem->nextItem;
-//    struct ListItem *secondHelper = secondItem->nextItem;
-//    struct ListItem *firstHelper2 = firstItem->previousItem;
-//    struct ListItem *secondHelper2 = secondItem->previousItem;
-//    if(firstItem->previousItem == NULL){
-//        secondItem->nextItem = firstHelper;
-//        second
-//    }
-//    secondItem->nextItem = firstHelper;
-//    secondItem->previousItem = firstHelper2;
-//    firstItem->nextItem = secondHelper;
-//    firstItem->previous = secondHelper2;
-    struct ListItem *secondHelper = secondItem;
-    struct ListItem *firstHelper = firstItem;
-    firstItem = secondHelper;
-    secondItem = firstHelper;
-
-    return SUCCESS;
 }
 
 int LinkedListPrint(ListItem * list) {
-    if (list == NULL) {
+    if (!list) {
         return STANDARD_ERROR;
     }
-    struct ListItem *head = LinkedListGetFirst(list);
-    int count = 0;
-    while (head != NULL) {
-        count++;
-        printf("%d, ", head);
-        head = head->nextItem;
+    ListItem* curr = malloc(sizeof (ListItem));
+    if (curr) {
+        curr = LinkedListGetFirst(list);
+        while (curr) {
+            printf("\n\t%s.", curr->data);
+            curr = curr->nextItem;
+        }
+        free(curr);
+        return SUCCESS;
+    } else {
+        free(curr);
+        return STANDARD_ERROR;
     }
-    return SUCCESS;
-
 }
