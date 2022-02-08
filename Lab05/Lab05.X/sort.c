@@ -17,13 +17,11 @@ ListItem *CreateUnsortedList(void); //this function has been written for you
 ListItem *SelectionSort(ListItem* list);
 ListItem *InsertionSort(ListItem* list);
 
-
 /* Students should not need to modify main! */
-int main(void)
-{
+int main(void) {
     BOARD_Init();
 
-    printf("\n\nWelcome to CRUZID's sort.c, compiled on %s %s.\n", __DATE__, __TIME__);
+    printf("\n\nWelcome to taltaffe's sort.c, compiled on %s %s.\n", __DATE__, __TIME__);
 
     ListItem* listToSort;
 
@@ -60,9 +58,25 @@ int main(void)
  * 
  * This function does not print.
  */
-ListItem *SelectionSort(ListItem* list)
-{
-   //YOUR CODE GOES HERE!
+ListItem *SelectionSort(ListItem* list) {
+    ListItem* first_u = LinkedListGetFirst(list);
+    ListItem* tail = LinkedListGetLast(list);
+    ListItem* scan = first_u;
+
+    while (first_u != LinkedListGetLast(list)) {
+        scan = first_u->nextItem;
+        while (scan) {
+            if (strcmp(first_u->data, scan->data) > 0) {
+                LinkedListSwapData(first_u, scan);
+            }
+            scan = scan->nextItem;
+        }
+        first_u = first_u->nextItem;
+    }
+    free(scan);
+    free(first_u);
+    free(tail);
+    return LinkedListGetFirst(list);
 }
 
 /**
@@ -77,9 +91,35 @@ ListItem *SelectionSort(ListItem* list)
  * 
  * This function does not print.
  */
-ListItem *InsertionSort(ListItem* list)
-{
-   //YOUR CODE GOES HERE!
+ListItem *InsertionSort(ListItem* list) {
+    ListItem* tail = LinkedListGetLast(list);
+    ListItem* first_sorted = tail;
+    ListItem* last_unsorted = tail;
+    ListItem* scan = tail;
+
+    while (first_sorted->previousItem) {
+        last_unsorted = first_sorted->previousItem;
+
+        if (strcmp(last_unsorted->data, first_sorted->data) < 0) {
+            first_sorted = first_sorted->previousItem;
+        } else {
+            scan = first_sorted;
+            while (scan->nextItem) {
+                if (strcmp(scan->nextItem->data, last_unsorted->data) > 0) {
+                    break;
+                } else {
+                    scan = scan->nextItem;
+                }
+            }
+            char* remove_result = LinkedListRemove(last_unsorted);
+            scan->nextItem = LinkedListCreateAfter(scan, remove_result);
+        }
+    }
+    free(first_sorted);
+    free(last_unsorted);
+    free(scan);
+    free(tail);
+    return LinkedListGetFirst(list);
 }
 
 /* CreateUnsortedList() uses the functions in the LinkedList library to
@@ -94,15 +134,16 @@ ListItem *InsertionSort(ListItem* list)
 ListItem *CreateUnsortedList(void)
 /// <editor-fold defaultstate="collapsed" desc="CreateUnsortedList definition">
 {
- char* wordList[] = {
-        "decide",   "toothpaste",   "lowly",        "robin",        "reign",        "crowd",
-        "pies",     "reduce",       "tendency",     "surround",     "finger",       "rake", 
-        "alleged",  "hug",          "nest",         "punishment",   "eggnog",       "side", 
-        "beef",     "exuberant",    "sort",         "scream",       "zip",          "hair", 
-        "ragged",   "damage",       "thought",      "jump",         "frequent",     "substance",
-        "head",     "step",         "faithful",     "sidewalk",     "pig",          "raspy",
-        "juggle",   "shut",         "maddening",    "rock",         "telephone",    "selective",
-        NULL};
+    char* wordList[] = {
+        "decide", "toothpaste", "lowly", "robin", "reign", "crowd",
+        "pies", "reduce", "tendency", "surround", "finger", "rake",
+        "alleged", "hug", "nest", "punishment", "eggnog", "side",
+        "beef", "exuberant", "sort", "scream", "zip", "hair",
+        "ragged", "damage", "thought", "jump", "frequent", "substance",
+        "head", "step", "faithful", "sidewalk", "pig", "raspy",
+        "juggle", "shut", "maddening", "rock", "telephone", "selective",
+        NULL
+    };
     //  char* wordList[] = {"D", "A", "C", "E", "B", NULL};
 
 
@@ -111,7 +152,7 @@ ListItem *CreateUnsortedList(void)
     ListItem* tail = head;
     for (i = 1; wordList[i] != NULL; i++) {
         tail = LinkedListCreateAfter(tail, wordList[i]);
-        if(tail == NULL){
+        if (tail == NULL) {
             printf("ERROR:  Heap full! Please increase heap size.\n");
             FATAL_ERROR();
         }

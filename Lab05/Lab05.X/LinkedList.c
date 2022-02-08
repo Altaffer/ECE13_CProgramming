@@ -14,14 +14,14 @@
 #include "LinkedList.h"
 
 ListItem *LinkedListNew(char *data) {
-    struct ListItem *newItem = (struct ListItem*) malloc(sizeof (struct ListItem));
-    if (newItem == NULL) {
+    ListItem *node = (struct ListItem*) malloc(sizeof (struct ListItem));
+    if (!node) {
         return NULL;
     }
-    newItem->data = data;
-    newItem->nextItem = NULL;
-    newItem->previousItem = NULL;
-    return newItem;
+    node->data = data;
+    node->nextItem = NULL;
+    node->previousItem = NULL;
+    return node;
 }
 
 ListItem *LinkedListCreateAfter(ListItem *item, char *data) {
@@ -44,11 +44,11 @@ ListItem *LinkedListCreateAfter(ListItem *item, char *data) {
 }
 
 char *LinkedListRemove(ListItem * item) {
-    if (item == NULL) {
+    if (!item) {
         return NULL;
     }
     char* dat = item->data;
-    if ((item->previousItem == NULL) || (item->nextItem == NULL)) {
+    if ((!item->previousItem) || (!item->nextItem)) {
         free(item);
     } else {
         item->nextItem->previousItem = item->previousItem;
