@@ -342,17 +342,18 @@ void runOvenSM(void) {
                     // update led
                     updateLEDs();
                     updateOvenOLED(oven);
-                } else {
-                    // THIS IS WHERE THE OLED WOULD FLASH
-                    // AFTER COOKING IS FINISHED
-                    oven.state = FLASHING;
-                    // reset settings
-                    oven.time_curr = oven.time_start;
-                    if (oven.cookmode == BAKE) {
-                        oven.temp_curr = oven.temp_start;
-                    }
-                    oven.prevState = COOKING;
-                }
+                } 
+//                else {
+//                    // THIS IS WHERE THE OLED WOULD FLASH
+//                    // AFTER COOKING IS FINISHED
+//                    oven.state = FLASHING;
+//                    // reset settings
+//                    oven.time_curr = oven.time_start;
+//                    if (oven.cookmode == BAKE) {
+//                        oven.temp_curr = oven.temp_start;
+//                    }
+//                    oven.prevState = COOKING;
+//                }
                 oneSecond = FALSE;
             }
             break;
@@ -391,17 +392,18 @@ void runOvenSM(void) {
                         // update led
                         updateLEDs();
                         updateOvenOLED(oven);
-                    } else {
-                        // THIS IS WHERE THE OLED WOULD FLASH
-                        // AFTER COOKING IS FINISHED
-                        // reset settings
-                        oven.state = FLASHING;
-                        oven.time_curr = oven.time_start;
-                        if (oven.cookmode == BAKE) {
-                            oven.temp_curr = oven.temp_start;
-                        }
-                        oven.prevState = COOKING;
-                    }
+                    } 
+//                    else {
+//                        // THIS IS WHERE THE OLED WOULD FLASH
+//                        // AFTER COOKING IS FINISHED
+//                        // reset settings
+//                        oven.state = FLASHING;
+//                        oven.time_curr = oven.time_start;
+//                        if (oven.cookmode == BAKE) {
+//                            oven.temp_curr = oven.temp_start;
+//                        }
+//                        oven.prevState = COOKING;
+//                    }
                     oneSecond = FALSE;
                 }
                 TIMER_TICK = FALSE;
