@@ -1,0 +1,7 @@
+Author: Luca Altaffer taltaffe@ucsc.edu
+
+1. In this lab we created an RPG that works by manuvering through several files that have their own information and can be interacted with. In my opinion the hardest and most i mportant pieces of this lab was figuring out how to manuver through the different files given the commands and the NESW style to them. 
+
+2. I started the lab, like always, by reading the lab manual first. I then proceded to strategise my code by drafting up pseudocode and making drawings to visualize things. Once I had a good understanding on how the the code would flow, I began to write the code and debugged as I went. I started with Player.c, moved onto Game.C then finally the main. After my time in the class, I beleived that this strategy worked well and is a good formula to continue with. I did ask for help when is came to my pseudocode and the logic of how I would approach things. I find that talking about my logic is a great way for me to truely understand the best approach.
+
+3. In the end, the lab ended up working out. I must have spent the better parts of 4 days on this lab and enjoyed it. I think the whole RPG aspect of it gave it some character that made it seem fun. I noticed that Max Dunne likes to implement his fantasical interests when he gets a chance in classes. I thought we were well prepared for this lab, however I did find the Makefile part was not the most clear thing on the planet. I think several people in the class could agree with me on that. 
