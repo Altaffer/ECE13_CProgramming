@@ -97,6 +97,8 @@ void AgentInit(void) {
  */
 Message AgentRun(BB_Event event) {
     switch (Agent.State) {
+
+        case(AGENT_STATE_START):
             /*
              * AGENT_STATE_START, //0
              * - Display new game message
@@ -108,17 +110,37 @@ Message AgentRun(BB_Event event) {
              * --- (you received a challenge "CHA")
              * 
              */
-
-        case(AGENT_STATE_START):
-            // display new game message
-            //        OledClear(OLED_COLOR_BLACK);
-            //        OledDrawString("Press BTN4 to start.\n");
-            //        OledUpdate();
+            // <editor-fold defaultstate="collapsed" desc="AGENT_STATE_START">
             if (event.type == BB_EVENT_START_BUTTON) {
-                
-            } else if(event.type == BB_EVENT_CHA_RECEIVED){
-                
+                // generate A, #a
+                Agent.A = rand();
+                Agent.A_hash = NegotiationHash(Agent.A);
+                // send CHA
+                Agent.returnMessage.type = MESSAGE_CHA;
+                Agent.returnMessage.param0 = Agent.A_hash;
+                // initialize fields
+                FieldInit(&Agent.ownField, &Agent.oppField);
+                //place own boats
+                FieldAIPlaceAllBoats(&Agent.ownField);
+                // go to challenging
+                Agent.State = AGENT_STATE_CHALLENGING;
+
+            } else if (event.type == BB_EVENT_CHA_RECEIVED) {
+                // store #a
+                Agent.A_hash = event.param0;
+                // generate B
+                Agent.B = rand();
+                // send ACC
+                Agent.returnMessage.type = MESSAGE_ACC;
+                Agent.returnMessage.param0 = Agent.B;
+                // init fields
+                Field.Init(&Agent.ownField, &Agent.oppField);
+                // place boats
+                FieldAIPlaceAllBoats(&Agent.ownField);
+                // go to accepting
+                Agent.State = AGENT_STATE_ACCEPTING;
             }
+            // </editor-fold>
             break;
 
         case(AGENT_STATE_CHALLENGING):
@@ -129,11 +151,24 @@ Message AgentRun(BB_Event event) {
              * - if coin flip doesnt go your way go to defending
              * 
              */
-            if (event.type == BB_EVENT_RESET_BUTTON){
+            // <editor-fold defaultstate="collapsed" desc="AGENT_STATE_CHALLENGING">
+            if (event.type == BB_EVENT_RESET_BUTTON) {
                 AgentInit();
-            } else if(event.type == BB_EVENT_ACC_RECEIVED){
-                
+
+            } else if (event.type == BB_EVENT_ACC_RECEIVED) {
+                // get B from event
+                Agent.B = event.param0;
+                Agent.returnMessage.type = MESSAGE_REV;
+                Agent.returnMessage.param0 = Agent.A;
+                // coin flip
+                Agent.coinFlipResult = NegotiateCoinFlip(Agent.A, Agent.B);
+                if (Agent.coinFlipResult == HEADS) {
+                    Agent.State = AGENT_STATE_WAITING_TO_SEND;
+                } else if (Agent.coinFlipResult == HEADS) {
+                    Agent.State = AGENT_STATE_DEFENDING;
+                }
             }
+            // </editor-fold>
             break;
 
         case(AGENT_STATE_ACCEPTING):
@@ -144,12 +179,18 @@ Message AgentRun(BB_Event event) {
              * - if coin flip doesnt go your way go to defending
              * 
              */
-            if (event.type == BB_EVENT_RESET_BUTTON){
+            if (event.type == BB_EVENT_RESET_BUTTON) {
                 AgentInit();
-            } else if(event.type == BB_EVENT_REV_RECEIVED){
-                
+            } else if (event.type == BB_EVENT_REV_RECEIVED) {
+                Agent.A = event.param0;
+
+                if (NegotiationVerify(Agent.A, Agent.A_hash)) {
+                   // not cheating
+                    Agent.coinFlipResult = NegotiateCoinFlip(Agent.A, Agent.B);
+                    
+                }
             } else {
-                
+
             }
             break;
 
@@ -163,10 +204,10 @@ Message AgentRun(BB_Event event) {
              * - not yet go to defending
              * 
              */
-            if (event.type == BB_EVENT_RESET_BUTTON){
+            if (event.type == BB_EVENT_RESET_BUTTON) {
                 AgentInit();
-            } else if(event.type == BB_EVENT_RES_RECEIVED){
-                
+            } else if (event.type == BB_EVENT_RES_RECEIVED) {
+
             }
             break;
 
@@ -180,10 +221,10 @@ Message AgentRun(BB_Event event) {
              * - not yet go to waiting to sent
              * 
              */
-            if (event.type == BB_EVENT_RESET_BUTTON){
+            if (event.type == BB_EVENT_RESET_BUTTON) {
                 AgentInit();
-            } else if(event.type == BB_EVENT_SHO_RECEIVED){
-                
+            } else if (event.type == BB_EVENT_SHO_RECEIVED) {
+
             }
             break;
 
@@ -195,8 +236,8 @@ Message AgentRun(BB_Event event) {
              * - go to attacking
              * 
              */
-            if (event.type == BB_EVENT_MESSAGE_SENT){
-                
+            if (event.type == BB_EVENT_MESSAGE_SENT) {
+
             }
             break;
 
