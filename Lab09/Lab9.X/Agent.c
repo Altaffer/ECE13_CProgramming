@@ -1,7 +1,8 @@
 /*
- * Author: Luca Altaffer
- * Title: Agent.c
- * Desc: Implements the Agent AI state machine functions in Agent.h. 
+ * File:   Agent.c
+ * Author: Luca Altaffer taltaffe@ucsc.edu
+ *
+ * Created on March 10, 2022, 9:46 AM
  */
 
 #include <stdint.h>
@@ -48,9 +49,6 @@ typedef struct {// all data an agent can access
     // holds return or respective field function
     SquareStatus regEnemyAttack;
     SquareStatus updatedKnowledge;
-    
-    Field ownField;
-    Field oppField;
 
     // message to return
     Message returnMessage;
@@ -140,7 +138,7 @@ Message AgentRun(BB_Event event) {
                 Agent.returnMessage.type = MESSAGE_ACC;
                 Agent.returnMessage.param0 = Agent.B;
                 // init fields
-                Field.Init(&Agent.ownField, &Agent.oppField);
+                FieldInit(&Agent.ownField, &Agent.oppField);
                 // place boats
                 FieldAIPlaceAllBoats(&Agent.ownField);
                 // go to accepting
