@@ -30,6 +30,9 @@ typedef struct {// all data an agent can access
 
     // set the outcome of the game
     EndStates Outcome;
+    
+    // guess at where to shoot
+    GuessData guess;
 
     // store own field and a knowledge of opponent field
     Field ownField;
@@ -43,6 +46,9 @@ typedef struct {// all data an agent can access
     NegotiationOutcome coinFlipResult;
 
     // holds return or respective field function
+    SquareStatus regEnemyAttack;
+    SquareStatus updatedKnowledge;
+    
     Field ownField;
     Field oppField;
 
@@ -179,19 +185,44 @@ Message AgentRun(BB_Event event) {
              * - if coin flip doesnt go your way go to defending
              * 
              */
-            if (event.type == BB_EVENT_RESET_BUTTON) {
+            // <editor-fold defaultstate="collapsed" desc="AGENT_STATE_ACCEPTING">
+           if (event.type == BB_EVENT_RESET_BUTTON) {
                 AgentInit();
-            } else if (event.type == BB_EVENT_REV_RECEIVED) {
-                Agent.A = event.param0;
 
+            } else if (event.type == BB_EVENT_REV_RECEIVED) {
+
+                Agent.A = event.param0;
+                
                 if (NegotiationVerify(Agent.A, Agent.A_hash)) {
-                   // not cheating
+
+                    // not cheating
                     Agent.coinFlipResult = NegotiateCoinFlip(Agent.A, Agent.B);
-                    
+                    if (Agent.coinFlipResult == HEADS) {
+                        Agent.returnMessage.type = MESSAGE_NONE;
+                        Agent.State = AGENT_STATE_DEFENDING;
+                    } else if (Agent.coinFlipResult == TAILS) {
+                        // decide a coordinate to guess
+                        Agent.guess = FieldAIDecideGuess(&Agent.oppField);
+                        // create the message to send
+
+                        Agent.returnMessage.type = MESSAGE_SHO;
+                        Agent.returnMessage.param0 = Agent.guess.row;
+                        Agent.returnMessage.param1 = Agent.guess.col;
+
+                        Agent.State = AGENT_STATE_ATTACKING;
+                    }
+
+                } else {
+                    OledClear(OLED_COLOR_BLACK);
+                    OledDrawString("Cheating Detected.");
+                    OledUpdate();
+                    Agent.returnMessage.type = MESSAGE_NONE;
+                    Agent.Outcome = CHEATING;
+                    Agent.State = AGENT_STATE_END_SCREEN;
                 }
-            } else {
 
             }
+           // </editor-fold>
             break;
 
         case(AGENT_STATE_ATTACKING):
@@ -204,11 +235,32 @@ Message AgentRun(BB_Event event) {
              * - not yet go to defending
              * 
              */
+            // <editor-fold defaultstate="collapsed" desc="AGENT_STATE_ATTACKING">
+            // should this state check if res coordinates == its guess?
             if (event.type == BB_EVENT_RESET_BUTTON) {
                 AgentInit();
             } else if (event.type == BB_EVENT_RES_RECEIVED) {
+                // update record of enemy field
+                Agent.guess.row = event.param0;
+                Agent.guess.col = event.param1;
+                Agent.guess.result = event.param2;
+                Agent.updatedKnowledge = FieldUpdateKnowledge(&Agent.oppField, &Agent.guess);
 
+                // if get boat states is 0 the player won, go to end
+                // else go defending
+                if (!FieldGetBoatStates(&Agent.oppField)) {
+                    Agent.Outcome = WIN;
+                    OledClear(OLED_COLOR_BLACK);
+                    OledDrawString("You sunk all enemy ships");
+                    OledUpdate();
+                    Agent.State = AGENT_STATE_END_SCREEN;
+                } else {
+                    Agent.State = AGENT_STATE_DEFENDING;
+                }
+                
+                Agent.returnMessage.type = MESSAGE_NONE;
             }
+            // </editor-fold>
             break;
 
         case(AGENT_STATE_DEFENDING):
@@ -221,11 +273,42 @@ Message AgentRun(BB_Event event) {
              * - not yet go to waiting to sent
              * 
              */
-            if (event.type == BB_EVENT_RESET_BUTTON) {
+            // <editor-fold defaultstate="collapsed" desc="AGENT_STATE_DEFENDING">
+             if (event.type == BB_EVENT_RESET_BUTTON) {
                 AgentInit();
             } else if (event.type == BB_EVENT_SHO_RECEIVED) {
+                // update own field based on event params                
+                Agent.guess.row = event.param0;
+                Agent.guess.col = event.param1;
+                Agent.regEnemyAttack = FieldRegisterEnemyAttack(&Agent.ownField, &Agent.guess);
 
+                // send RES
+                Agent.returnMessage.type = MESSAGE_RES;
+                Agent.returnMessage.param0 = event.param0;
+                Agent.returnMessage.param1 = event.param1;
+                // use regEnemyAttack to figure out if the shot was a hit or miss
+                // if it is a part of a boat then shot hit
+                // else any other return means shot missed
+                if ((Agent.regEnemyAttack == FIELD_SQUARE_HUGE_BOAT) ||
+                        (Agent.regEnemyAttack == FIELD_SQUARE_LARGE_BOAT) ||
+                        (Agent.regEnemyAttack == FIELD_SQUARE_MEDIUM_BOAT) ||
+                        (Agent.regEnemyAttack == FIELD_SQUARE_SMALL_BOAT)) {
+                    Agent.returnMessage.param2 = TRUE;
+                } else {
+                    Agent.returnMessage.param2 = FALSE;
+                }
+
+                if (!FieldGetBoatStates(&Agent.ownField)) {
+                    Agent.Outcome = LOSS;
+                    OledClear(OLED_COLOR_BLACK);
+                    OledDrawString("Enemy sunk all of your ships");
+                    OledUpdate();
+                    Agent.State = AGENT_STATE_END_SCREEN;
+                } else {
+                    Agent.State = AGENT_STATE_WAITING_TO_SEND;
+                }
             }
+             // </editor-fold>
             break;
 
         case(AGENT_STATE_WAITING_TO_SEND):
@@ -236,9 +319,20 @@ Message AgentRun(BB_Event event) {
              * - go to attacking
              * 
              */
+            // <editor-fold defaultstate="collapsed" desc="AGENT_STATE_W2S">
             if (event.type == BB_EVENT_MESSAGE_SENT) {
+                Agent.turnCount++;
+                // decide a coordinate to guess
+                Agent.guess = FieldAIDecideGuess(&Agent.oppField);
 
+                // create the message to send
+                Agent.returnMessage.type = MESSAGE_SHO;
+                Agent.returnMessage.param0 = Agent.guess.row;
+                Agent.returnMessage.param1 = Agent.guess.col;
+
+                Agent.State = AGENT_STATE_ATTACKING;
             }
+            // </editor-fold>
             break;
 
         case (AGENT_STATE_END_SCREEN):
