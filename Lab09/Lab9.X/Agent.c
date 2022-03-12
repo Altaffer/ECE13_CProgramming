@@ -7,6 +7,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <xc.h>
 
 #include "Agent.h"
 #include "Field.h"
@@ -31,7 +32,7 @@ typedef struct {// all data an agent can access
 
     // set the outcome of the game
     EndStates Outcome;
-    
+
     // guess at where to shoot
     GuessData guess;
 
@@ -70,9 +71,10 @@ static AgentData Agent;
  *  */
 void AgentInit(void) {
     FieldInit(&Agent.ownField, &Agent.oppField);
+    FieldAIPlaceAllBoats(&Agent.ownField);
 
     Agent.A = 0;
-    Agent.A_hash = 0;
+    Agent.A_hash = NegotiationHash(Agent.A);
     Agent.B = 0;
 
     Agent.Outcome = PLAYING;
@@ -117,15 +119,12 @@ Message AgentRun(BB_Event event) {
             // <editor-fold defaultstate="collapsed" desc="AGENT_STATE_START">
             if (event.type == BB_EVENT_START_BUTTON) {
                 // generate A, #a
-                Agent.A = rand();
+                printf("START BUTTON PRESSED!\n");
+                Agent.A = rand() & 0xFFFF;
                 Agent.A_hash = NegotiationHash(Agent.A);
                 // send CHA
                 Agent.returnMessage.type = MESSAGE_CHA;
                 Agent.returnMessage.param0 = Agent.A_hash;
-                // initialize fields
-                FieldInit(&Agent.ownField, &Agent.oppField);
-                //place own boats
-                FieldAIPlaceAllBoats(&Agent.ownField);
                 // go to challenging
                 Agent.State = AGENT_STATE_CHALLENGING;
 
@@ -133,14 +132,10 @@ Message AgentRun(BB_Event event) {
                 // store #a
                 Agent.A_hash = event.param0;
                 // generate B
-                Agent.B = rand();
+                Agent.B = rand() & 0xFFFF;
                 // send ACC
                 Agent.returnMessage.type = MESSAGE_ACC;
                 Agent.returnMessage.param0 = Agent.B;
-                // init fields
-                FieldInit(&Agent.ownField, &Agent.oppField);
-                // place boats
-                FieldAIPlaceAllBoats(&Agent.ownField);
                 // go to accepting
                 Agent.State = AGENT_STATE_ACCEPTING;
             }
@@ -156,10 +151,7 @@ Message AgentRun(BB_Event event) {
              * 
              */
             // <editor-fold defaultstate="collapsed" desc="AGENT_STATE_CHALLENGING">
-            if (event.type == BB_EVENT_RESET_BUTTON) {
-                AgentInit();
-
-            } else if (event.type == BB_EVENT_ACC_RECEIVED) {
+            if (event.type == BB_EVENT_ACC_RECEIVED) {
                 // get B from event
                 Agent.B = event.param0;
                 Agent.returnMessage.type = MESSAGE_REV;
@@ -168,9 +160,11 @@ Message AgentRun(BB_Event event) {
                 Agent.coinFlipResult = NegotiateCoinFlip(Agent.A, Agent.B);
                 if (Agent.coinFlipResult == HEADS) {
                     Agent.State = AGENT_STATE_WAITING_TO_SEND;
-                } else if (Agent.coinFlipResult == HEADS) {
+                } else if (Agent.coinFlipResult == TAILS) {
                     Agent.State = AGENT_STATE_DEFENDING;
                 }
+            } else if(event.type == BB_EVENT_RESET_BUTTON) {
+                // nada
             }
             // </editor-fold>
             break;
@@ -184,21 +178,19 @@ Message AgentRun(BB_Event event) {
              * 
              */
             // <editor-fold defaultstate="collapsed" desc="AGENT_STATE_ACCEPTING">
-           if (event.type == BB_EVENT_RESET_BUTTON) {
-                AgentInit();
 
-            } else if (event.type == BB_EVENT_REV_RECEIVED) {
+            if (event.type == BB_EVENT_REV_RECEIVED) {
 
                 Agent.A = event.param0;
-                
+
                 if (NegotiationVerify(Agent.A, Agent.A_hash)) {
 
                     // not cheating
                     Agent.coinFlipResult = NegotiateCoinFlip(Agent.A, Agent.B);
-                    if (Agent.coinFlipResult == HEADS) {
+                    if (Agent.coinFlipResult == TAILS) {
                         Agent.returnMessage.type = MESSAGE_NONE;
                         Agent.State = AGENT_STATE_DEFENDING;
-                    } else if (Agent.coinFlipResult == TAILS) {
+                    } else if (Agent.coinFlipResult == HEADS) {
                         // decide a coordinate to guess
                         Agent.guess = FieldAIDecideGuess(&Agent.oppField);
                         // create the message to send
@@ -220,7 +212,9 @@ Message AgentRun(BB_Event event) {
                 }
 
             }
-           // </editor-fold>
+
+
+            // </editor-fold>
             break;
 
         case(AGENT_STATE_ATTACKING):
@@ -235,9 +229,7 @@ Message AgentRun(BB_Event event) {
              */
             // <editor-fold defaultstate="collapsed" desc="AGENT_STATE_ATTACKING">
             // should this state check if res coordinates == its guess?
-            if (event.type == BB_EVENT_RESET_BUTTON) {
-                AgentInit();
-            } else if (event.type == BB_EVENT_RES_RECEIVED) {
+            if (event.type == BB_EVENT_RES_RECEIVED) {
                 // update record of enemy field
                 Agent.guess.row = event.param0;
                 Agent.guess.col = event.param1;
@@ -255,8 +247,8 @@ Message AgentRun(BB_Event event) {
                 } else {
                     Agent.State = AGENT_STATE_DEFENDING;
                 }
-                
-                Agent.returnMessage.type = MESSAGE_NONE;
+
+                Agent.returnMessage.type = MESSAGE_RES;
             }
             // </editor-fold>
             break;
@@ -272,7 +264,7 @@ Message AgentRun(BB_Event event) {
              * 
              */
             // <editor-fold defaultstate="collapsed" desc="AGENT_STATE_DEFENDING">
-             if (event.type == BB_EVENT_RESET_BUTTON) {
+            if (event.type == BB_EVENT_RESET_BUTTON) {
                 AgentInit();
             } else if (event.type == BB_EVENT_SHO_RECEIVED) {
                 // update own field based on event params                
@@ -306,7 +298,7 @@ Message AgentRun(BB_Event event) {
                     Agent.State = AGENT_STATE_WAITING_TO_SEND;
                 }
             }
-             // </editor-fold>
+            // </editor-fold>
             break;
 
         case(AGENT_STATE_WAITING_TO_SEND):
